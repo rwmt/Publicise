@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputPath>../</OutputPath>
+        <OutputType>Exe</OutputType>
+        <DebugType>None</DebugType>
+        <TargetFramework>net35</TargetFramework>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <PackageId>RimWorld.Publicise</PackageId>
+        <PackageVersion>1.0</PackageVersion>
+        <PackageIconUrl>https://i.imgur.com/amy7QJE.png</PackageIconUrl>
+        <PackageLicenseUrl>https://github.com/rwmt/Publicise/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/rwmt/Publicise</PackageProjectUrl>
+        <Description>CSharp tool to make assemblies public</Description>
+        <Title>Publicise</Title>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="dnlib" Version="3.3.1" />
+        <PackageReference Include="NuGet.Build.Packaging" Version="0.2.0" />
+    </ItemGroup>
+</Project>
