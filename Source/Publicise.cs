@@ -1,62 +1,59 @@
-﻿using System;
-using System.Text;
-using System.IO;
+﻿using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 using dnlib.DotNet;
 
-namespace Publicise
+namespace Publicise.MSBuild.Task
 {
-	class Program
-	{
-		const string hashFile = "publicise_hash.txt";
+    public class Publicise : Microsoft.Build.Utilities.Task
+    {
+        const string outputSuffix = "_public";
 
-		static void Main(string[] args)
+        public virtual string AssemblyPath { get; set; }
+
+        public virtual string OutputPath { get; set; }
+
+        public override bool Execute()
 		{
-			if(args.Length == 0)
-			{
-				Console.WriteLine($"Usage: {Path.GetFileName(args[0])} path-to-assembly [output path]");
-				return;
-			}
+            return MakePublic(AssemblyPath, OutputPath);
+        }
 
-			
-			string assemblyPath = args[0];
-			string outputPath = args.Length == 2 ? args[1] : "";
-
-			MakePublic(assemblyPath, outputPath);
-		}
-
-		public static void MakePublic(string assemblyPath, string outputPath)
+		bool MakePublic(string assemblyPath, string outputPath)
 		{
 			if (!File.Exists(assemblyPath))
 			{
-				Console.WriteLine($"Invalid path {assemblyPath}");
-				return;
+				Log.LogError($"Invalid path {assemblyPath}");
+				return false;
 			}
 
-			string lastHash = null;
+            string filename = Path.GetFileNameWithoutExtension(assemblyPath);
+
+            string lastHash = null;
 			string curHash = ComputeHash(assemblyPath);
 
-			string hashPath = Path.Combine(outputPath, hashFile);
+			string hashPath = Path.Combine(outputPath, $"{filename}{outputSuffix}.hash");
 
 			if (File.Exists(hashPath))
 				lastHash = File.ReadAllText(hashPath);
 
-			//Console.WriteLine($"{ComputeHash(assemblyPath)} {lastHash}");
+            //Log.LogMessage($"{ComputeHash(assemblyPath)} {lastHash}");
 
-			if (curHash == lastHash)
+            if (curHash == lastHash)
 			{
-				Console.WriteLine("Public assembly is up to date.");
-				return;
+				Log.LogMessage("Public assembly is up to date.");
+                return true;
 			}
 
-			Console.WriteLine($"Making a public assembly from {assemblyPath}");
+			Log.LogMessage($"Making a public assembly from {assemblyPath}");
 
-			RewriteAssembly(assemblyPath).Write($"{Path.Combine(outputPath, Path.GetFileNameWithoutExtension(assemblyPath))}_public.dll");
+			RewriteAssembly(assemblyPath).Write($"{Path.Combine(outputPath, filename)}{outputSuffix}.dll");
 
 			File.WriteAllText(hashPath, curHash);
+
+            return true;
 		}
 
-		private static string ComputeHash(string assemblyPath)
+		static string ComputeHash(string assemblyPath)
 		{
 			StringBuilder res = new StringBuilder();
 
@@ -76,7 +73,7 @@ namespace Publicise
 		}
 
 		// Based on https://gist.github.com/Zetrith/d86b1d84e993c8117983c09f1a5dcdcd
-		private static ModuleDef RewriteAssembly(string assemblyPath)
+		static ModuleDef RewriteAssembly(string assemblyPath)
 		{
 			ModuleDef assembly = ModuleDefMD.Load(assemblyPath);
 
