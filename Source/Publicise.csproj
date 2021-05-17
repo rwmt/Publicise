@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-    
+
     <PropertyGroup>
         <Title>Publicise</Title>
         <PackageId>Publicise.MSBuild.Task</PackageId>
-        <PackageVersion>1.3</PackageVersion>
+        <PackageVersion>1.4</PackageVersion>
         <Description>MSBuild task to make assemblies public.</Description>
         <Authors>notfood</Authors>
         <Product>Publicise.MSBuild.Task</Product>
@@ -18,9 +18,9 @@
         <PackageReleaseNotes>See $(PackageProjectUrl)/blob/master/CHANGELOG.md#v$(VersionPrefix.Replace('.','')) for release notes.</PackageReleaseNotes>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>
-    
+
     <PropertyGroup>
-        <TargetFrameworks>net46</TargetFrameworks>
+        <TargetFramework>net472</TargetFramework>
         <RootNamespace>Publicise.MSBuild.Task</RootNamespace>
         <AssemblyName>Publicise.MSBuild.Task</AssemblyName>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -30,20 +30,31 @@
         <Platforms>AnyCPU</Platforms>
         <developmentDependency>true</developmentDependency>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <None Remove="*.props" />
         <Content Include="Publicise.MSBuild.Task.TargetFramework.props" Pack="true" PackagePath="build\Publicise.MSBuild.Task.props" />
         <Content Include="Publicise.MSBuild.Task.TargetFrameworks.props" Pack="true" PackagePath="buildMultiTargeting\Publicise.MSBuild.Task.props" />
     </ItemGroup>
-    
-    <ItemGroup>
-        <Reference Include="Microsoft.Build.Utilities.v4.0" />
-    </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="dnlib" Version="3.3.1" PrivateAssets="All"/>
-        <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.18" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.9.0" />
+        <PackageReference Include="dnlib" Version="3.3.2" PrivateAssets="All" />
     </ItemGroup>
+
+    <!-- Because there is no msbuild ilrepack task that works for NET Core -->
+    <ItemGroup>
+        <PackageReference Include="ILRepack" Version="2.0.18" />
+    </ItemGroup>
+    <Target Name="PackLibs" AfterTargets="Build">
+         <ItemGroup>
+             <MergeAssemblies Include="$(OutputPath)\dnlib.dll" />
+         </ItemGroup>
+         <PropertyGroup>
+            <Merger Condition="('$(OS)' == 'Windows_NT')">$(ILRepack)</Merger>
+            <Merger Condition="('$(OS)' != 'Windows_NT')">mono $(ILRepack)</Merger>
+         </PropertyGroup>
+         <Exec Command="$(Merger) /target:library /out:$(OutputPath)\$(AssemblyName).dll $(OutputPath)$(AssemblyName).dll @(MergeAssemblies->'%(FullPath)', ' ')" />
+    </Target>
 
 </Project>
