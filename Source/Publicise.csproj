@@ -4,7 +4,7 @@
     <PropertyGroup>
         <Title>Publicise</Title>
         <PackageId>Publicise.MSBuild.Task</PackageId>
-        <PackageVersion>1.4</PackageVersion>
+        <PackageVersion>1.5</PackageVersion>
         <Description>MSBuild task to make assemblies public.</Description>
         <Authors>notfood</Authors>
         <Product>Publicise.MSBuild.Task</Product>
@@ -38,7 +38,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.9.0" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="16.9.0" PrivateAssets="All" />
         <PackageReference Include="dnlib" Version="3.3.2" PrivateAssets="All" />
     </ItemGroup>
 
