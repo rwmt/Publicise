@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using dnlib.DotNet;
-using dnlib.DotNet.MD;
 
 namespace Publicise.MSBuild.Task
 {
@@ -86,6 +86,10 @@ namespace Publicise.MSBuild.Task
 
                 foreach (MethodDef method in type.Methods)
                 {
+                    // Don't make methods which explicitly implement interfaces public 
+                    if (method.Overrides.Any())
+                        continue;
+                    
                     method.Attributes &= ~MethodAttributes.MemberAccessMask;
                     method.Attributes |= MethodAttributes.Public;
                 }
