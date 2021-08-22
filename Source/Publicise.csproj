@@ -5,7 +5,7 @@
         <Title>Publicise</Title>
         <PackageId>Publicise.MSBuild.Task</PackageId>
         <PackageVersion>1.6</PackageVersion>
-        <Description>MSBuild task to make assemblies public.</Description>
+        <Description>MSBuild task to make assemblies with all members public.</Description>
         <Authors>rwmt</Authors>
         <Product>Publicise.MSBuild.Task</Product>
         <Copyright>Copyright © rwmt</Copyright>
